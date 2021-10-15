@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
-import './screens/chat_screen.dart';
 
-void main() {
+import './screens/chat_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  // FirebaseFirestore.initializeApp();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -13,7 +18,6 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Chat',
       theme: ThemeData(
-
         primarySwatch: Colors.blue,
       ),
       home: ChatScreen(),

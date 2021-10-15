@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatelessWidget {
@@ -17,11 +18,15 @@ class ChatScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         onPressed: () {
+
           FirebaseFirestore.instance
-              .collection('chats/N5QWyitGiVMSTex68vPM/messages')
+              .collection('/chats/tvNf8Zik8nbr7BbNxVlM/messages')
               .snapshots()
               .listen((data) {
-            print(data);
+                data.docs.forEach((element) {
+                  print(element['text']);
+                });
+
           });
         },
       ),
