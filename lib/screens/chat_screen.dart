@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatelessWidget {
@@ -7,28 +6,38 @@ class ChatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ListView.builder(
-        itemCount: 10,
-        itemBuilder: (ctx, index) => Container(
-          padding: const EdgeInsets.all(8.0),
-          child: Text('This works'),
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(title: Text('Dummy Appbar'),),
+        body: StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('/chats/tvNf8Zik8nbr7BbNxVlM/messages')
+                .snapshots(),
+            builder: (ctx, streamSnapshot) {
+              if (streamSnapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              final documents= streamSnapshot.data?.docs ?? null;
+              return ListView.builder(
+                itemCount: documents?.length ?? 0,
+                itemBuilder: (ctx, index) => Container(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(documents?[index]['text']?? 'No data found'),
+                ),
+              );
+            }),
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: () {
+            FirebaseFirestore.instance
+                .collection('/chats/tvNf8Zik8nbr7BbNxVlM/messages').add({
+              'text':'Added by button click!',
+            });
+
+          },
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () {
-
-          FirebaseFirestore.instance
-              .collection('/chats/tvNf8Zik8nbr7BbNxVlM/messages')
-              .snapshots()
-              .listen((data) {
-                data.docs.forEach((element) {
-                  print(element['text']);
-                });
-
-          });
-        },
       ),
     );
   }
