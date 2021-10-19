@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../models/http_exception.dart' show HttpException;
+
 enum AuthMode { Signup, Login }
 
 class AuthForm extends StatefulWidget {
@@ -11,7 +13,6 @@ class AuthForm extends StatefulWidget {
 
 class _AuthFormState extends State<AuthForm> {
   final GlobalKey<FormState> _formKey = GlobalKey();
-
 
   AuthMode _authMode = AuthMode.Login;
   Map<String, String> _authData = {
@@ -27,16 +28,16 @@ class _AuthFormState extends State<AuthForm> {
     showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: Text('An error occurred'),
-          content: Text(errorMessage),
-          actions: [
-            TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'))
-          ],
-        ));
+              title: Text('An error occurred'),
+              content: Text(errorMessage),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('OK'))
+              ],
+            ));
   }
 
   Future<void> _submit() async {
@@ -92,55 +93,102 @@ class _AuthFormState extends State<AuthForm> {
       setState(() {
         _authMode = AuthMode.Signup;
       });
-      _controller!.forward();
     } else {
       setState(() {
         _authMode = AuthMode.Login;
       });
-      _controller!.reverse();
     }
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
+    final deviceSize = MediaQuery.of(context).size;
     return Center(
       child: Card(
+        // color: Theme.of(context).accentColor,
         margin: const EdgeInsets.all(20),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: InputDecoration(
-                      labelText: 'Email address',
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeIn,
+          height: _authMode == AuthMode.Signup ? 350 : 280,
+          width: deviceSize.width * 0.8,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: InputDecoration(
+                        labelText: 'Email address',
+                      ),
+                      validator: (value) {
+                        if (value!.isEmpty || !value.contains('@')) {
+                          return 'Invalid email!';
+                        }
+                      },
+                      onSaved: (value) {
+                        _authData['email'] = value!;
+                      },
                     ),
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(labelText: 'Username'),
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(labelText: 'Password'),
-                    obscureText: true,
-                  ),
-                  SizedBox(
-                    height: 12,
-                  ),
-                  ElevatedButton(
-                    child: Text('Login'),
-                    onPressed: () {},
-                  ),
-                  TextButton(
-                    child: Text("Create new account"),
-                    onPressed: () {},
-                  )
-                ],
+                    TextFormField(
+                      decoration: InputDecoration(labelText: 'Username'),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Invalid email!';
+                        }
+                      },
+                      onSaved: (value) {
+                        _authData['username'] = value!;
+                      },
+                    ),
+                    TextFormField(
+                      decoration: InputDecoration(labelText: 'Password'),
+                      obscureText: true,
+                      validator: (value) {
+                        if (value!.isEmpty || value.length < 6) {
+                          return 'Password is too short!';
+                        }
+                      },
+                      onSaved: (value) {
+                        _authData['password'] = value!;
+                      },
+                    ),
+                    SizedBox(
+                      height: 12,
+                    ),
+                    if (_isLoading)
+                      CircularProgressIndicator()
+                    else
+                      ElevatedButton(
+                        child: Text(
+                          _authMode == AuthMode.Login ? 'LOGIN' : 'SIGN UP',
+                        ),
+                        onPressed: _submit,
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                                Theme.of(context).primaryColor),
+                            padding:
+                                MaterialStateProperty.all(EdgeInsets.all(15.0)),
+                            foregroundColor: MaterialStateProperty.all(
+                                Theme.of(context).accentColor)),
+                      ),
+                    TextButton(
+                      child: Text(
+                        _authMode == AuthMode.Login
+                            ? 'Create new account'
+                            : 'Have an account? Login',
+                        style: TextStyle(
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                      onPressed: _switchAuthMode,
+                    )
+                  ],
+                ),
               ),
             ),
           ),
