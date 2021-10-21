@@ -1,12 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-import './screens/chat_screen.dart';
-import 'package:firebase_core/firebase_core.dart';
 import './screens/auth_screen.dart';
+import './screens/chat_screen.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // FirebaseFirestore.initializeApp();
   await Firebase.initializeApp();
   runApp(MyApp());
 }
@@ -23,16 +23,24 @@ class MyApp extends StatelessWidget {
         accentColor: Color(0xffefddf4),
         accentColorBrightness: Brightness.dark,
         buttonTheme: ButtonTheme.of(context).copyWith(
-
-          buttonColor: Color(0xff002222),
-          textTheme: ButtonTextTheme.primary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0),
-          )
-        ),
+            buttonColor: Color(0xff002222),
+            textTheme: ButtonTextTheme.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            )),
       ),
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (ctx, userSnapshot) {
+          print('user found');
+          if (userSnapshot.hasData) {
+            return ChatScreen();
+          }
+          print('user lost');
 
-      home: AuthScreen(),
+          return AuthScreen();
+        },
+      ),
     );
   }
 }
