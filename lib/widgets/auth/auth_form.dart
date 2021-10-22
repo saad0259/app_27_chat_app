@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import '../pickers/user_image_picker.dart';
 enum AuthMode { Signup, Login }
 
 class AuthForm extends StatefulWidget {
@@ -89,7 +89,7 @@ class _AuthFormState extends State<AuthForm> {
         child: AnimatedContainer(
           duration: Duration(milliseconds: 300),
           // curve: Curves.easeIn,
-          height: _authMode == AuthMode.Signup ? 300 : 240,
+          height: _authMode == AuthMode.Signup ? 430 : 300,
           width: deviceSize.width * 0.8,
           child: SingleChildScrollView(
             child: Padding(
@@ -97,8 +97,15 @@ class _AuthFormState extends State<AuthForm> {
               child: Form(
                 key: _formKey,
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    AnimatedSwitcher(
+                      duration: Duration(milliseconds: 300),
+                      child: _authMode == AuthMode.Login
+                          ? Container()
+                          : UserImagePicker(),
+                    ),
                     AnimatedSwitcher(
                       duration: Duration(milliseconds: 300),
                       child: _authMode == AuthMode.Signup
@@ -173,7 +180,7 @@ class _AuthFormState extends State<AuthForm> {
                           color: Theme.of(context).primaryColor,
                         ),
                       ),
-                      onPressed: _isLoading? null :_switchAuthMode,
+                      onPressed: _isLoading ? null : _switchAuthMode,
                     )
                   ],
                 ),
