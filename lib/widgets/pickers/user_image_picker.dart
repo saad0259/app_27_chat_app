@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class UserImagePicker extends StatefulWidget {
-  const UserImagePicker({Key? key}) : super(key: key);
+  final void Function(File pickedImage) imagePickFn;
+
+  UserImagePicker(this.imagePickFn);
 
   @override
   _UserImagePickerState createState() => _UserImagePickerState();
@@ -14,7 +16,6 @@ class _UserImagePickerState extends State<UserImagePicker> {
   File? _pickedImage;
 
   Future<void> _pickUserImage() async {
-    print('hi');
     final ImagePicker _picker = ImagePicker();
     showDialog(
         context: context,
@@ -25,15 +26,14 @@ class _UserImagePickerState extends State<UserImagePicker> {
                     onPressed: () async {
                       Navigator.of(context).pop();
                       final XFile? image =
-                          await _picker.pickImage(source: ImageSource.gallery);
-                      print('---------- before setState');
+                          await _picker.pickImage(source: ImageSource.gallery, imageQuality: 50, maxWidth: 200);
                       if (image == null) {
                         return;
                       }
                       setState(() {
-                        print('---------- inside setState');
                         _pickedImage = File(image.path);
                       });
+                      widget.imagePickFn(_pickedImage!);
                     },
                     child: Text('Open Gallery')),
                 TextButton(
@@ -47,12 +47,12 @@ class _UserImagePickerState extends State<UserImagePicker> {
                       setState(() {
                         _pickedImage = File(photo.path);
                       });
+                      widget.imagePickFn(_pickedImage!);
                     },
                     child: Text('Capture')),
               ],
             ));
 
-    print('End of pick Image');
     // Capture a photo
     //
   }

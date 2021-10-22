@@ -1,7 +1,9 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 
 import '../widgets/auth/auth_form.dart ';
 
@@ -17,8 +19,8 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   final _auth = FirebaseAuth.instance;
 
-  Future<void> _submitAuthData(
-      String email, String username, String password, bool isLogin) async {
+  Future<void> _submitAuthData(String email, String username, File userImageFile,
+       String password, bool isLogin) async {
     try {
       if (isLogin) {
         final _authResult = await _auth.signInWithEmailAndPassword(
@@ -26,10 +28,32 @@ class _AuthScreenState extends State<AuthScreen> {
       } else {
         final _authResult = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
-      await FirebaseFirestore.instance.collection('users').doc(_authResult.user!.uid).set(
-          {'username': username, 'email':email});
-      }
 
+        print('--------Path of Image is ${userImageFile.path}');
+
+        try{
+          final _ref = FirebaseStorage.instance
+              .ref()
+              .child('user_images')
+              .child(_authResult.user!.uid + '.jpg');
+
+          var result = await _ref.putFile(userImageFile);
+
+        print('----- result of instance $userImageFile');
+
+        final imageUrl = await _ref.getDownloadURL();
+
+        print('----- URL of file $imageUrl');
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(_authResult.user!.uid)
+            .set({'username': username, 'email': email, 'image_url': imageUrl});
+        }catch(error){
+          print('------ File Upload error $error');
+          return;
+        }
+      }
     } on FirebaseAuthException catch (e) {
       var errorMessage =
           e.message ?? 'Error occurred, please check your credentials!';
