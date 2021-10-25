@@ -19,38 +19,40 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   final _auth = FirebaseAuth.instance;
 
-  Future<void> _submitAuthData(String email, String username, File userImageFile,
-       String password, bool isLogin) async {
+  Future<void> _submitAuthData(String email, String username,
+      File? userImageFile, String password, bool isLogin) async {
     try {
       if (isLogin) {
-        final _authResult = await _auth.signInWithEmailAndPassword(
+        await _auth.signInWithEmailAndPassword(
             email: email, password: password);
       } else {
+        if (userImageFile == null) {
+          return;
+        }
         final _authResult = await _auth.createUserWithEmailAndPassword(
             email: email, password: password);
 
         print('--------Path of Image is ${userImageFile.path}');
 
-        try{
+        try {
           final _ref = FirebaseStorage.instance
               .ref()
               .child('user_images')
               .child(_authResult.user!.uid + '.jpg');
 
-          var result = await _ref.putFile(userImageFile);
+          await _ref.putFile(userImageFile);
 
-        print('----- result of instance $userImageFile');
+          final imageUrl = await _ref.getDownloadURL();
 
-        final imageUrl = await _ref.getDownloadURL();
-
-        print('----- URL of file $imageUrl');
-
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(_authResult.user!.uid)
-            .set({'username': username, 'email': email, 'image_url': imageUrl});
-        }catch(error){
-          print('------ File Upload error $error');
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(_authResult.user!.uid)
+              .set({
+            'username': username,
+            'email': email,
+            'image_url': imageUrl
+          });
+        } catch (error) {
           return;
         }
       }

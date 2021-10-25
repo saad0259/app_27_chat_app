@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 class NewMessage extends StatefulWidget {
   const NewMessage({Key? key}) : super(key: key);
@@ -12,22 +11,25 @@ class NewMessage extends StatefulWidget {
 
 class _NewMessageState extends State<NewMessage> {
   var _enteredMessage = '';
-  final _msgController=new TextEditingController();
+  final _msgController = new TextEditingController();
 
-  void _sendMessage() async{
+  void _sendMessage() async {
     FocusScope.of(context).unfocus();
-    final _user=FirebaseAuth.instance.currentUser;
+    final _user = FirebaseAuth.instance.currentUser;
     // TODO: get the userinfo and store username in map below
-    if(_user==null)
-      {
-        return;
-      }
-    final userData = await FirebaseFirestore.instance.collection('users').doc(_user.uid).get();
+    if (_user == null) {
+      return;
+    }
+    final userData = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(_user.uid)
+        .get();
     FirebaseFirestore.instance.collection('chat').add({
       'text': _enteredMessage.trim(),
       'createdAt': Timestamp.now(),
-      'userId':_user.uid,
-      'username':userData['username'],
+      'userId': _user.uid,
+      'username': userData['username'],
+      'userImage':userData['image_url'],
     });
     _msgController.clear();
   }
@@ -53,9 +55,7 @@ class _NewMessageState extends State<NewMessage> {
             ),
           ),
           IconButton(
-              onPressed: _enteredMessage
-                  .trim()
-                  .isEmpty ? null : _sendMessage,
+              onPressed: _enteredMessage.trim().isEmpty ? null : _sendMessage,
               icon: Icon(Icons.send)),
         ],
       ),

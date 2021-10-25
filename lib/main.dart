@@ -20,14 +20,12 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Chat',
       theme: ThemeData(
         primaryColor: Color(0xff002222),
-        accentColor: Color(0xffefddf4),
-        accentColorBrightness: Brightness.dark,
         buttonTheme: ButtonTheme.of(context).copyWith(
             buttonColor: Color(0xff002222),
             textTheme: ButtonTextTheme.primary,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20.0),
-            )),
+            )), colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Color(0xffefddf4)),
       ),
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),

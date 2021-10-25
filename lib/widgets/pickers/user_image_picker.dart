@@ -25,8 +25,10 @@ class _UserImagePickerState extends State<UserImagePicker> {
                 TextButton(
                     onPressed: () async {
                       Navigator.of(context).pop();
-                      final XFile? image =
-                          await _picker.pickImage(source: ImageSource.gallery, imageQuality: 50, maxWidth: 200);
+                      final XFile? image = await _picker.pickImage(
+                          source: ImageSource.gallery,
+                          imageQuality: 50,
+                          maxWidth: 150);
                       if (image == null) {
                         return;
                       }

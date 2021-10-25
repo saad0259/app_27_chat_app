@@ -35,9 +35,10 @@ class ChatMessages extends StatelessWidget {
                   itemCount: chatDocs?.length ?? 0,
                   itemBuilder: (ctx, index) => MessageBubble(
                     chatDocs![index]['username'],
+                    chatDocs[index]['image_url'],
                     chatDocs[index]['text'] ?? 'No data found',
                     chatDocs[index]['userId'] == snapshot.data!.uid,
-                  key: ValueKey(chatDocs[index].id),
+                    key: ValueKey(chatDocs[index].id),
                   ),
                 );
               });

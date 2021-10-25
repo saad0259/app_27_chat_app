@@ -7,9 +7,8 @@ import '../pickers/user_image_picker.dart';
 enum AuthMode { Signup, Login }
 
 class AuthForm extends StatefulWidget {
-  final Future<void> Function(
-          String email, String username, File userImageFile, String password, bool isLogin)?
-      submitAuthData;
+  final Future<void> Function(String email, String username, File? userImageFile,
+      String password, bool isLogin)? submitAuthData;
 
   AuthForm(this.submitAuthData);
 
@@ -33,31 +32,29 @@ class _AuthFormState extends State<AuthForm> {
   };
 
   var _isLoading = false;
-  final _passwordController = TextEditingController();
+
+  // final _passwordController = TextEditingController();
   void _showErrorDialog(String errorMessage) {
     showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: Text('An error occurred'),
-          content: Text(errorMessage),
-          actions: [
-            TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'))
-          ],
-        ));
+              title: Text('An error occurred'),
+              content: Text(errorMessage),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text('OK'))
+              ],
+            ));
   }
 
   Future<void> _submit() async {
-
-    if(_userImageFile==null && _authMode == AuthMode.Signup)
-      {
-        _showErrorDialog('Image not selected');
-        return;
-      }
-
+    if (_userImageFile == null && _authMode == AuthMode.Signup) {
+      _showErrorDialog('Image not selected');
+      return;
+    }
 
     if (!_formKey.currentState!.validate()) {
       // Invalid!
@@ -74,7 +71,7 @@ class _AuthFormState extends State<AuthForm> {
     await widget.submitAuthData!(
         _authData['email']!.trim(),
         _authData['username']!.trim(),
-        _userImageFile!,
+        _userImageFile,
         _authData['password']!.trim(),
         _authMode == AuthMode.Login ? true : false);
 
@@ -186,7 +183,7 @@ class _AuthFormState extends State<AuthForm> {
                             padding:
                                 MaterialStateProperty.all(EdgeInsets.all(15.0)),
                             foregroundColor: MaterialStateProperty.all(
-                                Theme.of(context).accentColor)),
+                                Theme.of(context).colorScheme.secondary)),
                       ),
                     TextButton(
                       child: Text(
