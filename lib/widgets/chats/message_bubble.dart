@@ -33,7 +33,7 @@ class MessageBubble extends StatelessWidget {
               ),
               width: 140.0,
               padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
-              margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+              margin: EdgeInsets.symmetric(vertical: 15.0, horizontal: 8.0),
               child: Column(
                 crossAxisAlignment:
                     isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
@@ -62,10 +62,11 @@ class MessageBubble extends StatelessWidget {
           ],
         ),
         Positioned(
-          top: -30,
-          left: 120,
+          top: -5,
+          left: isMe ? null : 120,
+          right: isMe ? 120 : null,
           child: CircleAvatar(
-            // backgroundImage: NetworkImage(imageUrl),
+            backgroundImage: NetworkImage(imageUrl),
           ),
         ),
       ],
